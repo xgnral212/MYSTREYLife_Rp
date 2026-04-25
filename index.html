@@ -3,434 +3,448 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Italian Mafia | Syndicate OS</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>MysteryLife RP | Encrypted Waves</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;600;800&display=swap');
+
         :root {
-            --bg-deep: #050505;
-            --bg-sidebar: #0a0a0a;
-            --accent: #c0c0c0; /* Gunmetal Silver */
-            --gold: #b39359;
-            --card-bg: #111111;
-            --text: #e0e0e0;
-            --border: #222;
+            --primary-red: #ff0000;
+            --dark-red: #8b0000;
+            --bg-black: #050505;
+            --card-gray: #0f0f0f;
         }
 
-        /* Themes */
-        .theme-red { --gold: #900; --accent: #400; }
-        .theme-blue { --gold: #0044cc; --accent: #001133; }
-        .theme-white-brown { --bg-deep: #f4f1ea; --bg-sidebar: #2d1b14; --gold: #8b4513; --text: #111; --card-bg: #ffffff; --border: #ddd; }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Garamond', serif; transition: 0.3s ease; }
-        body { background: var(--bg-deep); color: var(--text); overflow: hidden; height: 100vh; }
-
-        /* Splash Screen */
-        #splash {
-            position: fixed; inset: 0; z-index: 1000;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), 
-                        url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        body {
+            background-color: var(--bg-black);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-image: 
+                linear-gradient(rgba(255, 0, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
         }
-        #splash.slide-right { transform: translateX(100%); transition: 1s cubic-bezier(0.85, 0, 0.15, 1); }
 
-        /* Auth Panel */
-        #auth-panel {
-            position: fixed; left: 0; top: 0; width: 40%; height: 100%;
-            background: var(--bg-sidebar); z-index: 900; display: flex; 
-            flex-direction: column; justify-content: center; padding: 60px;
-            border-right: 2px solid var(--border); transform: translateX(-100%);
+        .mystery-border {
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
         }
-        #auth-panel.visible { transform: translateX(0); transition: 0.8s ease-out; }
 
-        /* Layout */
-        #main-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
-        .sidebar { background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .nav-item { padding: 18px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: #666; border-bottom: 1px solid #151515; font-size: 0.95rem; letter-spacing: 1px; }
-        .nav-item:hover, .nav-item.active { background: #111; color: var(--gold); border-left: 4px solid var(--gold); }
+        .neon-red-text {
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
 
-        .content { padding: 50px; overflow-y: auto; background: var(--bg-deep); }
-        .section { display: none; }
-        .section.active { display: block; animation: fadeIn 0.6s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .ptt-active {
+            background: radial-gradient(circle, var(--primary-red) 0%, var(--dark-red) 100%) !important;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.6) !important;
+            transform: scale(0.95);
+        }
 
-        /* Components */
-        .card { background: var(--card-bg); padding: 30px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input, select, textarea { width: 100%; padding: 14px; background: #000; border: 1px solid var(--border); color: #fff; margin-top: 10px; }
-        .btn { padding: 15px 30px; background: var(--gold); color: #000; border: none; cursor: pointer; font-weight: bold; margin-top: 15px; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
-        .btn:hover { filter: brightness(1.2); }
+        .user-card {
+            background: rgba(20, 20, 20, 0.6);
+            border-right: 4px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        /* Morse System */
-        .morse-box { background: #000; padding: 20px; border: 1px dashed var(--gold); color: var(--gold); font-family: monospace; letter-spacing: 4px; margin-top: 15px; cursor: pointer; min-height: 50px; }
+        .user-card.speaking {
+            border-right-color: var(--primary-red);
+            background: rgba(255, 0, 0, 0.05);
+            transform: translateX(-5px);
+        }
 
-        /* Chat System */
-        #chat-log { height: 400px; overflow-y: auto; background: #000; border: 1px solid var(--border); padding: 20px; margin-bottom: 15px; }
-        .msg { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #111; }
-        .msg-meta { font-size: 0.75rem; color: var(--gold); margin-bottom: 4px; font-weight: bold; }
+        .glass-header {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+        }
 
-        /* Report Style */
-        .doc-official { background: #fff; color: #111; padding: 80px; max-width: 850px; margin: 0 auto; position: relative; border: 1px solid #ccc; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-        .doc-header { border-bottom: 4px solid #000; padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
-        .stamp { position: absolute; bottom: 80px; left: 80px; border: 4px solid #900; color: #900; padding: 15px; transform: rotate(15deg); font-weight: bold; opacity: 0.5; }
-        .report-img { width: 100%; max-height: 350px; object-fit: cover; margin: 20px 0; border: 2px solid #000; }
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 0, 0, 0.1);
+            position: absolute;
+            top: 0;
+            z-index: 50;
+            animation: scan 4s linear infinite;
+        }
 
-        .hidden { display: none !important; }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .orbitron { font-family: 'Syncopate', sans-serif; }
     </style>
 </head>
-<body id="body">
+<body class="h-screen flex items-center justify-center p-4">
+    <div class="scanline"></div>
 
-    <!-- Step 1: Splash -->
-    <div id="splash" onclick="showAuth()">
-        <div style="text-align: center;">
-            <h1 style="color: #fff; font-size: 4rem; letter-spacing: 25px; font-weight: 100;">COSA NOSTRA</h1>
-            <p style="color: var(--gold); letter-spacing: 10px; margin-top: 10px;">ITALIAN MAFIA MANAGEMENT OS</p>
+    <!-- STARTUP / LOGIN SCREEN -->
+    <div id="setup-screen" class="w-full max-w-lg bg-[#0a0a0a] mystery-border rounded-lg p-10 z-20 transition-all duration-700">
+        <div class="text-center mb-10">
+            <h1 class="orbitron text-3xl font-bold tracking-tighter mb-2">
+                <span class="text-white">MYSTERY</span><span class="text-[#ff0000]">LIFE</span>
+            </h1>
+            <div class="h-1 w-20 bg-[#ff0000] mx-auto mb-4"></div>
+            <p class="text-xs text-gray-500 uppercase tracking-[0.3em]">Encrypted Tactical Radio</p>
         </div>
-    </div>
 
-    <!-- Step 2: Auth -->
-    <div id="auth-panel">
-        <h2 style="color: var(--gold); letter-spacing: 5px;">IDENTITY CHECK</h2>
-        <p style="color: #444; font-size: 0.8rem; margin-bottom: 40px;">Biometric & Key Encryption Active</p>
-        <input type="text" id="login-u" placeholder="Codename">
-        <input type="password" id="login-p" placeholder="Secure Key">
-        <button class="btn" onclick="login()">Enter Syndicate</button>
-        <p id="err" style="color: red; font-size: 0.8rem; margin-top: 20px; display: none;">Access Denied. Footprint Logged.</p>
-    </div>
-
-    <!-- Step 3: UI -->
-    <div id="main-ui">
-        <aside class="sidebar">
-            <div style="padding: 40px 25px; border-bottom: 1px solid var(--border);">
-                <h3 style="color: var(--gold); letter-spacing: 4px;">ITALIAN MAFIA</h3>
+        <div class="space-y-6">
+            <!-- Warning Box for Firebase Configuration -->
+            <div id="auth-warning" class="hidden p-3 bg-amber-600/20 border border-amber-600 text-amber-500 text-[10px] uppercase font-bold text-center rounded">
+                Note: Offline Mode Active. Enable "Anonymous Auth" in Firebase for Multiplayer.
             </div>
-            <nav style="flex: 1;">
-                <div class="nav-item active" onclick="nav('home', this)"><i data-lucide="shield"></i> Home</div>
-                <div class="nav-item" onclick="nav('cipher', this)"><i data-lucide="key"></i> Morse Cipher</div>
-                <div class="nav-item" onclick="nav('intel', this)"><i data-lucide="radio"></i> Instructions</div>
-                <div class="nav-item hidden" id="nav-reports" onclick="nav('archive', this)"><i data-lucide="file-text"></i> Archive</div>
-                <div class="nav-item hidden" id="nav-mgmt" onclick="nav('mgmt', this)"><i data-lucide="users"></i> Family Mgmt</div>
-            </nav>
-            <div style="padding: 20px;">
-                <select onchange="setTheme(this.value)" style="font-size: 0.8rem; margin-bottom: 15px;">
-                    <option value="">Theme: Gunmetal (Default)</option>
-                    <option value="theme-red">Theme: Blood Red</option>
-                    <option value="theme-blue">Theme: Midnight Blue</option>
-                    <option value="theme-white-brown">Theme: Ivory Classic</option>
-                </select>
-                <div id="user-tag" style="font-size: 0.7rem; color: var(--gold); font-weight: bold;"></div>
+            
+            <div class="relative">
+                <label class="text-[10px] uppercase font-bold text-gray-500 mb-2 block">Operator Identity</label>
+                <input type="text" id="username" placeholder="CALLSIGN / NAME" 
+                    class="w-full bg-black border border-zinc-800 p-4 rounded text-sm focus:outline-none focus:border-red-600 transition-all uppercase">
             </div>
-        </aside>
-
-        <main class="content">
-            <!-- Home -->
-            <section id="home" class="section active">
-                <h1 style="font-size: 3.5rem;">Welcome to <span style="color: var(--gold);">Italian Mafia</span></h1>
-                <h2 id="welcome-msg" style="margin-top: 10px; font-weight: 300;"></h2>
-                <div class="card" style="margin-top: 50px; border-left: 4px solid var(--gold);">
-                    <p style="font-style: italic; color: #999;">"This system is designed to manage the operations you will record here. Integrity and silence are our core."</p>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div class="card"><h4>Network Status</h4><p style="color: #0f0;">SECURE / ENCRYPTED</p></div>
-                    <div class="card"><h4>Active Dossiers</h4><p id="rep-count" style="font-size: 2rem;">0</p></div>
-                </div>
-            </section>
-
-            <!-- Cipher -->
-            <section id="cipher" class="section">
-                <h2>Tactical Morse Cipher</h2>
-                <div class="card">
-                    <textarea id="cipher-in" rows="4" placeholder="Enter text to encrypt or Morse to decrypt..."></textarea>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn" onclick="processMorse(true)">Encrypt</button>
-                        <button class="btn" onclick="processMorse(false)">Decrypt</button>
-                    </div>
-                    <div id="cipher-out" class="morse-box" onclick="copyText()">...</div>
-                    <p style="font-size: 0.7rem; color: #444; margin-top: 10px;">Click the box to copy result.</p>
-                </div>
-            </section>
-
-            <!-- Instructions (Chat) -->
-            <section id="intel" class="section">
-                <h2>Operational Intel</h2>
-                <div id="chat-log"></div>
-                <div id="chat-ctrl" class="hidden">
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="chat-in" placeholder="Issue order..." style="margin: 0;">
-                        <button class="btn" onclick="sendChat()" style="margin:0; width: 120px;">Send</button>
-                    </div>
-                </div>
-                <p id="chat-guest" style="font-size: 0.8rem; color: #444; margin-top: 10px;">Read-only mode active for your rank.</p>
-            </section>
-
-            <!-- Archive -->
-            <section id="archive" class="section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                    <h2>Syndicate Archive</h2>
-                    <button class="btn" style="width: auto;" onclick="openReportModal()">+ Create Report</button>
-                </div>
-                <div class="card">
-                    <input type="text" id="search-rep" placeholder="Search report by name..." onkeyup="filterReps()">
-                </div>
-                <div id="rep-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"></div>
-                <div id="rep-view" style="margin-top: 50px;"></div>
-            </section>
-
-            <!-- Management -->
-            <section id="mgmt" class="section">
-                <h2>Family Hierarchy</h2>
-                <div class="card">
-                    <h3>Recruit Member</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <input type="text" id="m-user" placeholder="Name">
-                        <input type="text" id="m-pass" placeholder="Key">
-                    </div>
-                    <select id="m-role">
-                        <option value="Co The mafia">Co The mafia</option>
-                        <option value="Ceo Mafia">Ceo Mafia</option>
-                        <option value="Leader 0">Leader 0</option>
-                        <option value="Leader 1">Leader 1</option>
-                        <option value="Leader 2">Leader 2</option>
-                        <option value="Leader 3">Leader 3</option>
-                        <option value="Deta">Deta</option>
-                        <option value="big">big</option>
-                        <option value="winr">winr</option>
-                        <option value="Gostr">Gostr</option>
-                        <option value="Member">Member</option>
-                    </select>
-                    <button class="btn" onclick="addMember()">Add to Family</button>
-                </div>
-                <div id="family-list" class="card"></div>
-            </section>
-        </main>
+            <div class="relative">
+                <label class="text-[10px] uppercase font-bold text-gray-500 mb-2 block">Frequency (MHz)</label>
+                <input type="number" id="frequency" step="0.1" placeholder="000.0" 
+                    class="w-full bg-black border border-zinc-800 p-4 rounded text-2xl orbitron font-bold text-red-600 focus:outline-none focus:border-red-600 transition-all">
+            </div>
+            <button id="initialize-link" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-5 rounded uppercase tracking-widest text-sm transition-all active:scale-95">
+                Initialize Secure Link
+            </button>
+        </div>
+        
+        <p class="mt-10 text-center text-[10px] text-zinc-600 uppercase tracking-widest">
+            Protected by MysteryLife RP Security Protocol
+        </p>
     </div>
 
-    <!-- Modal for Report -->
-    <div id="report-modal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:2000; padding:50px; overflow-y:auto;">
-        <div class="card" style="max-width: 600px; margin: 0 auto;">
-            <h3>New Official Dossier</h3>
-            <input type="text" id="r-title" placeholder="Report Subject">
-            <input type="text" id="r-author" placeholder="Filed By" readonly>
-            <input type="date" id="r-date">
-            <select id="r-type" onchange="toggleReportType(this.value)">
-                <option value="text">Text Only</option>
-                <option value="image">Text & Image</option>
-            </select>
-            <input type="text" id="r-img-url" placeholder="Image URL (Direct link)" class="hidden">
-            <textarea id="r-body" rows="10" placeholder="Operation Details..."></textarea>
-            <div style="display:flex; gap:10px;">
-                <button class="btn" onclick="submitReport()">Archive</button>
-                <button class="btn" style="background:#444;" onclick="openReportModal()">Cancel</button>
+    <!-- MAIN RADIO INTERFACE -->
+    <div id="main-interface" class="hidden w-full max-w-6xl h-[700px] flex gap-4 transition-all duration-700 opacity-0 scale-95">
+        
+        <!-- MAIN PANEL (Center/Right) -->
+        <div class="flex-1 flex flex-col bg-[#080808] mystery-border rounded-lg overflow-hidden relative">
+            <div class="glass-header p-6 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="bg-red-600/10 p-3 rounded border border-red-600/30">
+                        <i class="fa-solid fa-tower-broadcast text-red-600 animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h2 class="orbitron text-xs font-bold text-white uppercase" id="room-id-display">WAVE: 000.0</h2>
+                        <p class="text-[9px] text-red-500 font-bold uppercase tracking-widest">Status: <span id="sync-status">Syncing...</span></p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] text-zinc-500 uppercase font-bold">Active Operators</p>
+                    <p class="text-xl orbitron font-bold" id="user-count">0</p>
+                </div>
+            </div>
+
+            <!-- Users List -->
+            <div id="users-list" class="flex-1 overflow-y-auto p-6 space-y-3">
+                <!-- User Items -->
+            </div>
+
+            <!-- Footer / PTT -->
+            <div class="p-10 bg-black/40 border-t border-zinc-900 flex flex-col items-center">
+                <div class="w-full h-16 mb-6">
+                    <canvas id="voice-waves" class="w-full h-full"></canvas>
+                </div>
+                
+                <button id="ptt-button" class="w-28 h-28 rounded-full bg-zinc-900 border-4 border-zinc-800 flex flex-col items-center justify-center text-zinc-500 transition-all duration-100 select-none cursor-pointer group">
+                    <i class="fa-solid fa-microphone text-3xl mb-1 group-hover:text-red-500"></i>
+                    <span class="text-[10px] font-black orbitron">PUSH</span>
+                </button>
+                
+                <p class="mt-4 text-[9px] text-zinc-600 uppercase font-bold tracking-[0.4em]">Broadcast Secured by MysteryLife</p>
+            </div>
+        </div>
+
+        <!-- SIDEBAR (Right) -->
+        <div class="w-80 flex flex-col gap-4">
+            <!-- Profile Card -->
+            <div class="bg-[#0a0a0a] mystery-border p-6 rounded-lg flex flex-col items-center text-center">
+                <div class="w-20 h-20 bg-zinc-900 rounded-full border-2 border-red-600 flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-shield-halved text-2xl text-red-600"></i>
+                </div>
+                <h3 id="my-callsign" class="orbitron text-sm font-bold text-white mb-1">UNIT-01</h3>
+                <p class="text-[10px] text-zinc-500 uppercase tracking-widest mb-4">Authorized Personnel</p>
+                <div class="w-full h-px bg-zinc-800 mb-4"></div>
+                <button id="exit-link" class="w-full border border-red-600/30 hover:bg-red-600 hover:text-white text-red-600 py-3 rounded text-[10px] font-black uppercase tracking-widest transition-all">
+                    Disconnect
+                </button>
+            </div>
+
+            <!-- Radio Info -->
+            <div class="flex-1 bg-[#0a0a0a] mystery-border p-6 rounded-lg overflow-hidden">
+                <h4 class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">System Logs</h4>
+                <div id="radio-logs" class="space-y-3 text-[10px] font-mono text-zinc-600 uppercase">
+                    <p class="text-green-600">> OS INITIALIZED</p>
+                    <p id="auth-log-status" class="text-zinc-500">> WAITING FOR AUTH...</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // تأكد من صحة إعدادات Firebase وتفعيل Anonymous Auth في الكونسول
         const firebaseConfig = {
-            apiKey: "AIzaSyBXgq0jWYzTI-vGgQD15M1X1upIC__4WcI",
-            authDomain: "mafia-gta-d5e70.firebaseapp.com",
-            projectId: "mafia-gta-d5e70",
-            storageBucket: "mafia-gta-d5e70.firebasestorage.app",
-            messagingSenderId: "184060259228",
-            appId: "1:184060259228:web:947dad5b91e9041f003659"
+            apiKey: "AIzaSyDJdlo9mSdINt3A4KLvpBdxXjK28LdrWB0",
+            authDomain: "policerp-a71c8.firebaseapp.com",
+            projectId: "policerp-a71c8",
+            storageBucket: "policerp-a71c8.firebasestorage.app",
+            messagingSenderId: "569720054342",
+            appId: "1:569720054342:web:858b7f239f5c35929ca047",
+            measurementId: "G-TVEYLTLBBC"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const appId = "mafia-os-final-v3";
+        // Initialize Firebase
+        let app, db, auth;
+        let isFirebaseActive = false;
 
-        let currentU = null;
-        let users = [];
-        let reports = [];
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (e) {
+            console.error("Firebase initialization error", e);
+        }
 
-        // Morse Logic
-        const MORSE = {'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---','K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-','U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.','0':'-----',' ':'/'};
-        const REVERSE = Object.fromEntries(Object.entries(MORSE).map(([k,v])=>[v,k]));
+        const setupScreen = document.getElementById('setup-screen');
+        const mainInterface = document.getElementById('main-interface');
+        const pttButton = document.getElementById('ptt-button');
+        const usersList = document.getElementById('users-list');
+        const logsContainer = document.getElementById('radio-logs');
+        const authWarning = document.getElementById('auth-warning');
+        const syncStatus = document.getElementById('sync-status');
 
-        // محاولة تسجيل الدخول بشكل مجهول مع معالجة الخطأ
-        const initializeConnection = async () => {
+        let currentUser = { uid: "local-" + Math.random().toString(36).substr(2, 9) };
+        let localStream = null;
+        let isSpeaking = false;
+        let myName = "";
+        let myFreq = "";
+
+        // Attempt Auth with error handling
+        const attemptAuth = async () => {
+            if (!auth) return;
             try {
                 await signInAnonymously(auth);
+                const statusLog = document.getElementById('auth-log-status');
+                if (statusLog) {
+                    statusLog.className = "text-green-600";
+                    statusLog.textContent = "> AUTHENTICATED";
+                }
+                isFirebaseActive = true;
+                syncStatus.textContent = "Encrypted & Cloud Synced";
             } catch (err) {
-                console.warn("Auth Configuration issues. Proceeding as offline first but attempting sync.");
+                console.error("Auth restricted, running in local mode", err);
+                authWarning.classList.remove('hidden');
+                const statusLog = document.getElementById('auth-log-status');
+                if (statusLog) {
+                    statusLog.className = "text-amber-500";
+                    statusLog.textContent = "> AUTH RESTRICTED (LOCAL MODE)";
+                }
+                syncStatus.textContent = "Encrypted (Local Mode)";
             }
-            startSync();
         };
 
-        initializeConnection();
+        attemptAuth();
 
-        function startSync() {
-            onSnapshot(collection(db, "artifacts", appId, "public", "data", "users"), snap => {
-                users = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(!users.find(u => u.name === 'Finom')) {
-                    setDoc(doc(db, "artifacts", appId, "public", "data", "users", "boss"), {name:'Finom', pass:'5030', role:'BOSS'});
+        if (auth) {
+            onAuthStateChanged(auth, user => { 
+                if(user) {
+                    currentUser = user;
+                    isFirebaseActive = true;
+                    authWarning.classList.add('hidden');
                 }
-                renderUsers();
-            }, (error) => console.error("User Sync Error:", error));
+            });
+        }
 
-            onSnapshot(collection(db, "artifacts", appId, "public", "data", "chats"), snap => {
-                const chats = snap.docs.map(d => d.data()).sort((a,b)=>a.time - b.time);
-                const log = document.getElementById('chat-log');
-                if(log) {
-                    log.innerHTML = chats.map(c => `
-                        <div class="msg">
-                            <div class="msg-meta">${c.sender} (${c.role})</div>
-                            <div>${c.text}</div>
+        document.getElementById('initialize-link').onclick = async () => {
+            myName = document.getElementById('username').value.trim();
+            myFreq = document.getElementById('frequency').value.trim();
+
+            if(!myName || !myFreq) {
+                alert("Please enter operator identity and frequency.");
+                return;
+            }
+
+            try {
+                // Fix for OverconstrainedError: Use basic audio constraints
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: true 
+                });
+                
+                localStream.getAudioTracks()[0].enabled = false;
+
+                document.getElementById('room-id-display').textContent = `WAVE: ${parseFloat(myFreq).toFixed(1)}`;
+                document.getElementById('my-callsign').textContent = myName;
+                
+                setupScreen.classList.add('hidden');
+                mainInterface.classList.remove('hidden');
+                setTimeout(() => {
+                    mainInterface.classList.add('opacity-100', 'scale-100');
+                }, 50);
+
+                addLog(`LINK ESTABLISHED ON ${myFreq} MHZ`);
+                
+                if (isFirebaseActive) {
+                    await syncPresence(false);
+                    startListening();
+                } else {
+                    renderUser({ uid: currentUser.uid, name: myName, speaking: false });
+                    document.getElementById('user-count').textContent = "1 (Local)";
+                }
+                
+                initVisualizer();
+            } catch (e) {
+                console.error("Media access error:", e);
+                if (e.name === 'OverconstrainedError') {
+                    alert("Microphone Error: System could not satisfy audio constraints. Try refreshing or using a different mic.");
+                } else {
+                    alert("Microphone Access Denied. Required for radio transmission.");
+                }
+            }
+        };
+
+        async function syncPresence(speaking) {
+            if(!isFirebaseActive || !currentUser) return;
+            try {
+                const appId = "mysterylife-v4-red";
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'waves', currentUser.uid), {
+                    uid: currentUser.uid,
+                    name: myName,
+                    freq: myFreq,
+                    speaking: speaking,
+                    timestamp: Date.now()
+                });
+            } catch (err) {
+                console.error("Firestore sync error:", err);
+            }
+        }
+
+        function startListening() {
+            if(!isFirebaseActive) return;
+            const appId = "mysterylife-v4-red";
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'waves'), where("freq", "==", myFreq));
+            
+            onSnapshot(q, (snapshot) => {
+                usersList.innerHTML = '';
+                let count = 0;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    renderUser(data);
+                    count++;
+                });
+                document.getElementById('user-count').textContent = count;
+            }, (error) => {
+                console.error("Snapshot error:", error);
+                addLog("DATABASE SYNC ERROR");
+            });
+        }
+
+        function renderUser(user) {
+            const isMe = user.uid === currentUser.uid;
+            if (document.getElementById(`user-${user.uid}`)) return;
+
+            const card = document.createElement('div');
+            card.id = `user-${user.uid}`;
+            card.className = `user-card p-4 rounded flex justify-between items-center ${user.speaking ? 'speaking' : ''}`;
+            card.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-10 h-10 bg-black rounded flex items-center justify-center border border-zinc-800">
+                            <i class="fa-solid fa-user-shield ${user.speaking ? 'text-red-500' : 'text-zinc-700'}"></i>
                         </div>
-                    `).join('');
-                    log.scrollTop = log.scrollHeight;
-                }
-            }, (error) => console.error("Chat Sync Error:", error));
-
-            onSnapshot(collection(db, "artifacts", appId, "public", "data", "reports"), snap => {
-                reports = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                document.getElementById('rep-count').innerText = reports.length;
-                renderReports();
-            }, (error) => console.error("Report Sync Error:", error));
-        }
-
-        window.showAuth = () => {
-            document.getElementById('splash').classList.add('slide-right');
-            document.getElementById('auth-panel').classList.add('visible');
-        };
-
-        window.login = () => {
-            const u = document.getElementById('login-u').value;
-            const p = document.getElementById('login-p').value;
-            const found = users.find(x => x.name === u && x.pass === p);
-            if(found) {
-                currentU = found;
-                document.getElementById('auth-panel').classList.remove('visible');
-                document.getElementById('main-ui').style.display = 'grid';
-                document.getElementById('welcome-msg').innerText = `${currentU.name}, this terminal is assigned for your operations.`;
-                document.getElementById('user-tag').innerText = `${currentU.name.toUpperCase()} // ${currentU.role}`;
-                document.getElementById('r-author').value = currentU.name;
-
-                const high = ['BOSS', 'Co The mafia', 'Ceo Mafia'];
-                const mid = [...high, 'Leader 0', 'Leader 1', 'Leader 2', 'Leader 3', 'Deta', 'big', 'winr', 'Gostr'];
-
-                if(high.includes(currentU.role)) {
-                    document.getElementById('nav-mgmt').classList.remove('hidden');
-                    document.getElementById('chat-ctrl').classList.remove('hidden');
-                    document.getElementById('chat-guest').classList.add('hidden');
-                }
-                if(mid.includes(currentU.role)) {
-                    document.getElementById('nav-reports').classList.remove('hidden');
-                }
-                lucide.createIcons();
-            } else {
-                document.getElementById('err').style.display = 'block';
-            }
-        };
-
-        window.nav = (id, el) => {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-            lucide.createIcons();
-        };
-
-        window.processMorse = (enc) => {
-            const input = document.getElementById('cipher-in').value.toUpperCase();
-            let res = "";
-            if(enc) res = input.split('').map(c => MORSE[c] || c).join(' ');
-            else res = input.split(' ').map(c => REVERSE[c] || c).join('');
-            document.getElementById('cipher-out').innerText = res || "...";
-        };
-
-        window.copyText = () => {
-            const text = document.getElementById('cipher-out').innerText;
-            navigator.clipboard.writeText(text);
-        };
-
-        window.addMember = async () => {
-            const n = document.getElementById('m-user').value;
-            const p = document.getElementById('m-pass').value;
-            const r = document.getElementById('m-role').value;
-            if(!n || !p) return;
-            await addDoc(collection(db, "artifacts", appId, "public", "data", "users"), {name:n, pass:p, role:r});
-            document.getElementById('m-user').value = ''; document.getElementById('m-pass').value = '';
-        };
-
-        window.delMember = (id) => deleteDoc(doc(db, "artifacts", appId, "public", "data", "users", id));
-
-        function renderUsers() {
-            const list = document.getElementById('family-list');
-            if(!list) return;
-            list.innerHTML = `<h3>Hierarchy List</h3>` + users.map(u => `
-                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #111;">
-                    <span>${u.name} <small style="color:var(--gold)">[${u.role}]</small></span>
-                    ${(currentU?.role === 'BOSS' || currentU?.role === 'Co The mafia') && u.name !== 'Finom' ? `<button onclick="delMember('${u.id}')" style="color:red; background:none; border:none; cursor:pointer;">X</button>` : ''}
-                </div>
-            `).join('');
-        }
-
-        window.sendChat = async () => {
-            const text = document.getElementById('chat-in').value;
-            if(!text) return;
-            await addDoc(collection(db, "artifacts", appId, "public", "data", "chats"), {sender: currentU.name, role: currentU.role, text: text, time: Date.now()});
-            document.getElementById('chat-in').value = '';
-        };
-
-        window.openReportModal = () => document.getElementById('report-modal').classList.toggle('hidden');
-        window.toggleReportType = (v) => document.getElementById('r-img-url').className = (v === 'image' ? '' : 'hidden');
-
-        window.submitReport = async () => {
-            const t = document.getElementById('r-title').value;
-            const d = document.getElementById('r-date').value;
-            const b = document.getElementById('r-body').value;
-            const img = document.getElementById('r-img-url').value;
-            if(!t || !b) return;
-            await addDoc(collection(db, "artifacts", appId, "public", "data", "reports"), {title:t, date:d, body:b, img:img, author: currentU.name});
-            openReportModal();
-        };
-
-        function renderReports() {
-            const list = document.getElementById('rep-list');
-            if(!list) return;
-            list.innerHTML = reports.map(r => `
-                <div class="card" onclick="viewReport('${r.id}')" style="cursor:pointer; border-right: 4px solid var(--gold);">
-                    <h4 style="color:var(--gold)">${r.title}</h4>
-                    <p style="font-size:0.7rem; color:#444;">ID: ${r.id.substring(0,6)} | ${r.date}</p>
-                </div>
-            `).join('');
-        }
-
-        window.viewReport = (id) => {
-            const r = reports.find(x => x.id === id);
-            document.getElementById('rep-view').innerHTML = `
-                <div class="doc-official">
-                    <div class="doc-header">
-                        <div><h1 style="font-size:2.5rem; margin:0;">DOSSIER</h1><p>CODE: ${id.substring(0,8).toUpperCase()}</p></div>
-                        <div style="text-align:right;"><p>DATE: ${r.date}</p><p>AUTH: ${r.author}</p></div>
+                        ${user.speaking ? '<div class="absolute -top-1 -left-1 w-3 h-3 bg-red-600 rounded-full animate-ping"></div>' : ''}
                     </div>
-                    <h3>Subject: ${r.title}</h3>
-                    ${r.img ? `<img src="${r.img}" class="report-img">` : ''}
-                    <div style="margin-top:20px; min-height:300px; white-space:pre-wrap; line-height:1.6;">${r.body}</div>
-                    <div class="stamp">ITALIAN MAFIA<br>CERTIFIED FILE</div>
+                    <div>
+                        <p class="text-xs font-bold orbitron uppercase">${user.name} ${isMe ? '<span class="text-[9px] text-zinc-500">(YOU)</span>' : ''}</p>
+                        <p class="text-[8px] tracking-[0.2em] font-bold ${user.speaking ? 'text-red-500' : 'text-zinc-600'}">
+                            ${user.speaking ? '>> RECEIVING BROADCAST' : '>> STANDBY'}
+                        </p>
+                    </div>
                 </div>
             `;
-            document.getElementById('rep-view').scrollIntoView({behavior:'smooth'});
+            usersList.appendChild(card);
+        }
+
+        const startTalk = async () => {
+            if(isSpeaking) return;
+            isSpeaking = true;
+            pttButton.classList.add('ptt-active');
+            if(localStream) localStream.getAudioTracks()[0].enabled = true;
+            await syncPresence(true);
+            addLog(`TRANSMITTING...`);
+            
+            if(!isFirebaseActive) {
+                const me = document.getElementById(`user-${currentUser.uid}`);
+                if(me) me.classList.add('speaking');
+            }
         };
 
-        window.filterReps = () => {
-            const q = document.getElementById('search-rep').value.toLowerCase();
-            document.getElementById('rep-list').innerHTML = reports.filter(r => r.title.toLowerCase().includes(q)).map(r => `
-                <div class="card" onclick="viewReport('${r.id}')" style="cursor:pointer; border-right: 4px solid var(--gold);">
-                    <h4 style="color:var(--gold)">${r.title}</h4>
-                    <p style="font-size:0.7rem; color:#444;">ID: ${r.id.substring(0,6)} | ${r.date}</p>
-                </div>
-            `).join('');
+        const stopTalk = async () => {
+            if(!isSpeaking) return;
+            isSpeaking = false;
+            pttButton.classList.remove('ptt-active');
+            if(localStream) localStream.getAudioTracks()[0].enabled = false;
+            await syncPresence(false);
+            addLog(`TRANSMISSION ENDED`);
+
+            if(!isFirebaseActive) {
+                const me = document.getElementById(`user-${currentUser.uid}`);
+                if(me) me.classList.remove('speaking');
+            }
         };
 
-        window.setTheme = (v) => document.getElementById('body').className = v;
-        lucide.createIcons();
+        pttButton.onmousedown = startTalk;
+        pttButton.onmouseup = stopTalk;
+        pttButton.ontouchstart = (e) => { e.preventDefault(); startTalk(); };
+        pttButton.ontouchend = (e) => { e.preventDefault(); stopTalk(); };
+
+        document.getElementById('exit-link').onclick = async () => {
+            if(isFirebaseActive && currentUser) {
+                const appId = "mysterylife-v4-red";
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'waves', currentUser.uid));
+                } catch(e) {}
+            }
+            location.reload();
+        };
+
+        function addLog(msg) {
+            const p = document.createElement('p');
+            p.textContent = `> ${msg}`;
+            logsContainer.prepend(p);
+        }
+
+        function initVisualizer() {
+            const canvas = document.getElementById('voice-waves');
+            const ctx = canvas.getContext('2d');
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioCtx.createMediaStreamSource(localStream);
+            const analyser = audioCtx.createAnalyser();
+            source.connect(analyser);
+            analyser.fftSize = 128;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function draw() {
+                requestAnimationFrame(draw);
+                analyser.getByteFrequencyData(dataArray);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const barWidth = (canvas.width / bufferLength) * 2;
+                let x = 0;
+                for(let i = 0; i < bufferLength; i++) {
+                    const barHeight = dataArray[i] / 4;
+                    ctx.fillStyle = isSpeaking ? '#ff0000' : '#1a1a1a';
+                    ctx.fillRect(x, canvas.height/2 - barHeight/2, barWidth, barHeight);
+                    x += barWidth + 2;
+                }
+            }
+            draw();
+        }
     </script>
 </body>
 </html>
