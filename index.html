@@ -76,7 +76,7 @@
             <i class="fa-solid fa-ban text-white text-4xl"></i>
         </div>
         <h1 class="text-4xl font-black mb-4">أنت ممنوع من الدخول</h1>
-        <p class="text-zinc-400 mb-8 max-w-sm text-center" id="ban-reason">تم حظرك نهائياً من قبل الإدارة لمخالفة قوانين MysteryLife</p>
+        <p class="text-zinc-400 mb-8 max-w-sm text-center" id="ban-reason">تم حظرك من قبل الإدارة لمخالفة قوانين MysteryLife</p>
         <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center min-w-[250px]">
             <p class="text-xs text-zinc-500 uppercase tracking-widest mb-2">الوقت المتبقي</p>
             <p id="ban-timer" class="text-3xl font-mono font-bold text-red-500">00:00:00</p>
@@ -97,10 +97,10 @@
             <div class="space-y-5">
                 <div class="text-right">
                     <label class="text-[10px] text-zinc-600 font-bold mr-3 uppercase">اليوزر :</label>
-                    <input type="text" id="login-user" placeholder="i7" class="w-full bg-zinc-950 border border-zinc-900 p-4 rounded-2xl outline-none focus:border-red-600 transition-all text-white font-bold">
+                    <input type="text" id="login-user" placeholder="اليوزر الخاص بك" class="w-full bg-zinc-950 border border-zinc-900 p-4 rounded-2xl outline-none focus:border-red-600 transition-all text-white font-bold">
                 </div>
                 <div class="text-right">
-                    <label class="text-[10px] text-zinc-600 font-bold mr-3 uppercase">الباس :</label>
+                    <label class="text-[10px] text-zinc-600 font-bold mr-3 uppercase">الباسورد :</label>
                     <input type="password" id="login-pass" placeholder="••••••••" class="w-full bg-zinc-950 border border-zinc-900 p-4 rounded-2xl outline-none focus:border-red-600 transition-all text-white">
                 </div>
                 <button onclick="handleLogin()" class="w-full btn-primary py-4 rounded-2xl font-black text-white shadow-xl uppercase tracking-widest">تسجيل الدخول</button>
@@ -111,7 +111,7 @@
                 </div>
             </div>
             
-            <p class="mt-12 text-[9px] text-zinc-700 font-bold uppercase tracking-[0.3em]">MysteryLife Rp © 2024</p>
+            <p class="mt-12 text-[9px] text-zinc-700 font-bold uppercase tracking-[0.3em]">MysteryLife Rp © 2026</p>
         </div>
     </div>
 
@@ -120,12 +120,12 @@
         <div class="w-full max-w-md ml-glass p-10 rounded-[2.5rem] text-center">
             <h2 class="text-2xl font-black mb-8">إعداد الحساب</h2>
             
-            <div class="relative w-36 h-36 mx-auto mb-8 group cursor-pointer" onclick="document.getElementById('avatar-input').click()">
+            <div class="relative w-32 h-32 md:w-40 md:h-40 mx-auto mb-8 group cursor-pointer" onclick="document.getElementById('avatar-input').click()">
                 <img id="avatar-preview" src="https://ui-avatars.com/api/?name=User&background=111&color=ff0000" class="w-full h-full rounded-full object-cover border-4 border-red-600 p-1 bg-black">
                 <div class="absolute inset-0 bg-black/70 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
                     <i class="fa-solid fa-camera text-2xl"></i>
                 </div>
-                <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this)">
+                <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this, 'avatar-preview')">
             </div>
             <p class="text-[10px] text-zinc-500 font-bold mb-8 uppercase tracking-widest">اضغط لاختيار صورتك الشخصية</p>
 
@@ -142,10 +142,13 @@
     <div id="main-app" class="h-screen hidden flex overflow-hidden">
         
         <!-- القائمة الجانبية -->
-        <div class="w-72 bg-zinc-950 border-l border-zinc-900 flex flex-col">
-            <div class="p-8">
-                <h1 class="text-2xl font-black text-red-600 tracking-tighter italic">MYSTERYLIFE</h1>
-                <p class="text-[9px] text-zinc-600 font-bold mt-1">COMMUNITY NETWORK</p>
+        <div class="w-72 bg-zinc-950 border-l border-zinc-900 flex flex-col hidden md:flex absolute md:relative z-40 h-full" id="sidebar">
+            <div class="p-8 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-black text-red-600 tracking-tighter italic">MYSTERYLIFE</h1>
+                    <p class="text-[9px] text-zinc-600 font-bold mt-1">COMMUNITY NETWORK</p>
+                </div>
+                <button onclick="toggleSidebar()" class="md:hidden text-zinc-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
 
             <div class="flex-1 overflow-y-auto px-4 space-y-1 chat-scroll">
@@ -177,44 +180,45 @@
             <!-- معلومات المستخدم -->
             <div class="p-6 bg-zinc-900/50 flex items-center justify-between border-t border-zinc-900">
                 <div class="flex items-center gap-3">
-                    <img id="my-avatar" src="" class="w-10 h-10 rounded-full border-2 border-red-600 bg-black">
-                    <div class="w-28">
-                        <p id="my-nickname" class="text-xs font-black truncate">---</p>
+                    <img id="my-avatar" src="" class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-red-600 bg-black object-cover">
+                    <div class="w-24 md:w-28">
+                        <p id="my-nickname" class="text-xs font-black truncate flex items-center gap-1">---</p>
                         <p id="my-rank-text" class="text-[9px] text-zinc-500 uppercase font-bold">Member</p>
                     </div>
                 </div>
-                <button onclick="toggleModal('settings-modal')" class="p-2 text-zinc-600 hover:text-red-500 transition-all">
+                <button onclick="openSettings()" class="p-2 text-zinc-600 hover:text-red-500 transition-all">
                     <i class="fa-solid fa-sliders text-sm"></i>
                 </button>
             </div>
         </div>
 
         <!-- الشات -->
-        <div class="flex-1 flex flex-col bg-black">
-            <div class="h-20 border-b border-zinc-900 flex justify-between items-center px-8 bg-zinc-950/50">
+        <div class="flex-1 flex flex-col bg-black relative">
+            <div class="h-20 border-b border-zinc-900 flex justify-between items-center px-4 md:px-8 bg-zinc-950/50">
                 <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
+                    <button onclick="toggleSidebar()" class="md:hidden text-zinc-400 hover:text-white"><i class="fa-solid fa-bars text-xl"></i></button>
+                    <div class="w-2 h-2 rounded-full bg-red-600 animate-pulse ml-2 md:ml-0"></div>
                     <h2 id="channel-title" class="font-black text-sm uppercase tracking-widest">الشات العام</h2>
                 </div>
                 <div id="admin-actions" class="hidden items-center gap-4">
-                    <button onclick="toggleModal('admin-panel')" class="text-[9px] font-black bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition-all">لوحة التحكم</button>
+                    <button onclick="toggleModal('admin-panel')" class="text-[9px] font-black bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">لوحة التحكم</button>
                 </div>
             </div>
 
-            <div id="chat-box" class="flex-1 overflow-y-auto p-8 space-y-6 chat-scroll">
+            <div id="chat-box" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 chat-scroll">
                 <!-- الرسائل -->
             </div>
 
             <!-- الكتابة -->
-            <div class="p-6 bg-zinc-950">
-                <div class="max-w-4xl mx-auto flex items-end gap-4 bg-zinc-900 p-3 rounded-[2rem] border border-zinc-800">
+            <div class="p-4 md:p-6 bg-zinc-950">
+                <div class="max-w-4xl mx-auto flex items-end gap-2 md:gap-4 bg-zinc-900 p-2 md:p-3 rounded-[2rem] border border-zinc-800">
                     <button onclick="document.getElementById('file-input').click()" class="p-3 text-zinc-500 hover:text-red-600 transition-all">
                         <i class="fa-solid fa-paperclip"></i>
                         <input type="file" id="file-input" class="hidden" onchange="handleFileUpload(this)">
                     </button>
-                    <textarea id="msg-input" rows="1" class="flex-1 bg-transparent border-none outline-none p-3 text-sm font-bold text-zinc-200 placeholder-zinc-600 resize-none" placeholder="اكتب رسالتك هنا..."></textarea>
-                    <button onclick="sendMessage()" class="bg-red-600 w-12 h-12 rounded-full flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all shadow-lg shadow-red-600/20">
-                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    <textarea id="msg-input" rows="1" class="flex-1 bg-transparent border-none outline-none p-2 md:p-3 text-sm font-bold text-zinc-200 placeholder-zinc-600 resize-none" placeholder="اكتب رسالة أو أمر أدمن (ban/ , /mute/ , /tw/)..."></textarea>
+                    <button onclick="sendMessage()" class="bg-red-600 min-w-[40px] h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all shadow-lg shadow-red-600/20">
+                        <i class="fa-solid fa-paper-plane text-xs md:text-sm"></i>
                     </button>
                 </div>
             </div>
@@ -223,18 +227,29 @@
 
     <!-- مودال الإعدادات -->
     <div id="settings-modal" class="fixed inset-0 z-[60] hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="w-full max-w-md ml-glass p-10 rounded-[2.5rem] border border-zinc-800">
+        <div class="w-full max-w-md ml-glass p-8 md:p-10 rounded-[2.5rem] border border-zinc-800 max-h-[90vh] overflow-y-auto chat-scroll">
             <div class="flex justify-between items-center mb-8">
                 <h3 class="text-2xl font-black">الإعدادات</h3>
-                <button onclick="toggleModal('settings-modal')" class="text-zinc-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="toggleModal('settings-modal')" class="text-zinc-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
+            
             <div class="space-y-6">
+                <!-- تغيير الصورة من داخل الإعدادات -->
+                <div class="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 group cursor-pointer" onclick="document.getElementById('settings-avatar-input').click()">
+                    <img id="settings-avatar-preview" src="" class="w-full h-full rounded-full object-cover border-4 border-red-600 p-1 bg-black">
+                    <div class="absolute inset-0 bg-black/70 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                        <i class="fa-solid fa-camera text-xl md:text-2xl text-white"></i>
+                    </div>
+                    <input type="file" id="settings-avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this, 'settings-avatar-preview')">
+                </div>
+                <p class="text-[10px] text-zinc-500 font-bold mb-4 uppercase text-center w-full block tracking-widest">تغيير الصورة</p>
+
                 <div class="text-right">
                     <label class="text-[10px] text-zinc-500 font-bold uppercase mb-2 block">تغيير الاسم المستعار</label>
-                    <input type="text" id="set-nickname" class="w-full bg-zinc-950 border border-zinc-900 p-4 rounded-2xl text-white font-bold">
+                    <input type="text" id="set-nickname" class="w-full bg-zinc-950 border border-zinc-900 p-4 rounded-2xl text-white font-bold outline-none focus:border-red-600">
                 </div>
-                <div class="pt-6 space-y-3">
-                    <button onclick="updateSettings()" class="w-full btn-primary py-4 rounded-2xl font-black">حفظ التغييرات</button>
+                <div class="pt-4 space-y-3">
+                    <button onclick="updateSettings()" class="w-full btn-primary py-4 rounded-2xl font-black shadow-lg">حفظ التغييرات</button>
                 </div>
             </div>
         </div>
@@ -242,27 +257,29 @@
 
     <!-- لوحة المالك -->
     <div id="admin-panel" class="fixed inset-0 z-[60] hidden bg-black/95 flex items-center justify-center p-4">
-        <div class="w-full max-w-2xl ml-glass p-10 rounded-[3rem] border border-zinc-800">
+        <div class="w-full max-w-2xl ml-glass p-8 md:p-10 rounded-[3rem] border border-zinc-800 max-h-[90vh] overflow-y-auto chat-scroll">
             <div class="flex justify-between items-center mb-10">
-                <h3 class="text-2xl font-black text-yellow-500">OWNER PANEL</h3>
-                <button onclick="toggleModal('admin-panel')" class="text-zinc-500"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="text-xl md:text-2xl font-black text-yellow-500">OWNER PANEL</h3>
+                <button onclick="toggleModal('admin-panel')" class="text-zinc-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="bg-zinc-950 p-6 rounded-[2rem] border border-zinc-900">
                     <h4 class="text-xs font-black text-red-600 mb-6 uppercase tracking-widest">إدارة الطاقم</h4>
-                    <input type="text" id="admin-search-user" placeholder="يوزر المستخدم..." class="w-full bg-black border border-zinc-900 p-4 rounded-2xl text-sm mb-4">
+                    <input type="text" id="admin-search-user" placeholder="يوزر المستخدم..." class="w-full bg-black border border-zinc-900 p-4 rounded-2xl text-sm mb-4 font-bold outline-none focus:border-red-600">
                     <div class="flex gap-2">
-                        <button onclick="setRank('ADMIN')" class="flex-1 bg-red-600 py-3 rounded-xl text-xs font-black uppercase">ترقية</button>
-                        <button onclick="setRank('Member')" class="flex-1 bg-zinc-800 py-3 rounded-xl text-xs font-black uppercase text-zinc-400">سحب</button>
+                        <button onclick="setRank('ADMIN')" class="flex-1 bg-red-600 hover:bg-red-700 py-3 rounded-xl text-xs font-black uppercase transition-colors">ترقية</button>
+                        <button onclick="setRank('Member')" class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-3 rounded-xl text-xs font-black uppercase text-zinc-300 transition-colors">سحب</button>
                     </div>
                 </div>
 
                 <div class="bg-zinc-950 p-6 rounded-[2rem] border border-zinc-900">
-                    <h4 class="text-xs font-black text-yellow-500 mb-6 uppercase tracking-widest">طلبات الحظر</h4>
-                    <div id="ban-requests-list" class="space-y-3 max-h-48 overflow-y-auto chat-scroll">
-                        <p class="text-zinc-700 text-center py-8 text-[10px] font-bold">لا توجد طلبات معلقة</p>
-                    </div>
+                    <h4 class="text-xs font-black text-yellow-500 mb-6 uppercase tracking-widest">معلومات الأوامر (في الشات)</h4>
+                    <ul class="text-xs text-zinc-400 space-y-3 leading-relaxed" dir="ltr" style="text-align: left;">
+                        <li><span class="text-red-500 font-bold">/ban user hours</span> : Ban a user for specified hours.</li>
+                        <li><span class="text-red-500 font-bold">/mute user hours</span> : Mute a user for specified hours.</li>
+                        <li><span class="text-yellow-500 font-bold">/tw user</span> : Toggle Verified ⭐️ Badge for a user.</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -270,8 +287,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, query, where, updateDoc, deleteDoc, addDoc, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, query, where, updateDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDJdlo9mSdINt3A4KLvpBdxXjK28LdrWB0",
@@ -285,11 +302,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const appId = "mystery-rp-final-v2";
+        const appId = "mystery-rp-final-v3";
 
         let currentUser = null;
         let activeChannel = 'rules';
         let isLoginPage = true;
+        let userListenerUnsubscribe = null;
 
         // --- AUTH ---
         const initAuth = async () => {
@@ -333,7 +351,9 @@
                 password: password,
                 rank: rank,
                 createdAt: serverTimestamp(),
-                isBanned: false
+                isBanned: false,
+                isMuted: false,
+                isVerified: false
             });
 
             currentUser = { username: user, rank: rank };
@@ -350,7 +370,9 @@
                 const ownerRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', 'i7');
                 const oSnap = await getDoc(ownerRef);
                 if(!oSnap.exists()) {
-                    await setDoc(ownerRef, { username: 'i7', password: 'i7227711', rank: 'OWNER', isBanned: false });
+                    await setDoc(ownerRef, { username: 'i7', password: 'i7227711', rank: 'OWNER', isBanned: false, isMuted: false, isVerified: false });
+                } else if (oSnap.data().rank !== 'OWNER') {
+                    await updateDoc(ownerRef, { rank: 'OWNER' });
                 }
             }
 
@@ -367,6 +389,8 @@
                 if(data.banUntil > now) {
                     showBanScreen(data.banUntil, data.banReason);
                     return;
+                } else {
+                    await updateDoc(userRef, { isBanned: false });
                 }
             }
 
@@ -399,9 +423,7 @@
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
 
-            document.getElementById('my-nickname').textContent = currentUser.nickname;
-            document.getElementById('my-avatar').src = currentUser.avatar;
-            document.getElementById('my-rank-text').textContent = currentUser.rank;
+            updateUIInfo();
 
             if(currentUser.rank === 'OWNER' || currentUser.rank === 'ADMIN') {
                 document.getElementById('admin-channel-container').classList.remove('hidden');
@@ -412,7 +434,30 @@
             }
 
             switchChannel('general');
-            listenToBanRequests();
+            listenToMyData(); // Monitor if I get banned, muted, or verified while online
+        }
+
+        function updateUIInfo() {
+            const verifiedStar = currentUser.isVerified ? '<span class="text-yellow-400 text-sm ml-1">⭐️</span>' : '';
+            document.getElementById('my-nickname').innerHTML = `${currentUser.nickname} ${verifiedStar}`;
+            document.getElementById('my-avatar').src = currentUser.avatar;
+            document.getElementById('my-rank-text').textContent = currentUser.rank;
+        }
+
+        // Live monitor current user document
+        function listenToMyData() {
+            if(userListenerUnsubscribe) userListenerUnsubscribe();
+            userListenerUnsubscribe = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.username), (docSnap) => {
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    currentUser = { ...data, id: docSnap.id };
+                    updateUIInfo();
+
+                    if(data.isBanned && data.banUntil > Date.now()) {
+                        showBanScreen(data.banUntil, data.banReason);
+                    }
+                }
+            });
         }
 
         let chatUnsubscribe = null;
@@ -424,10 +469,12 @@
             const titles = { rules: 'القوانين العامة', info: 'تعريف الإدارة', general: 'الشات العام', staff: 'غرفة العمليات' };
             document.getElementById('channel-title').textContent = titles[channel];
             
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('hidden');
+            }
+
             if(chatUnsubscribe) chatUnsubscribe();
             
-            // تم الحل: استعلام بسيط بدون orderBy لتجنب الحاجة للفهرس (Index)
-            // الفلترة والترتيب سيتمان برمجياً في الذاكرة (Memory)
             const q = query(
                 collection(db, 'artifacts', appId, 'public', 'data', 'chats'),
                 where('channel', '==', activeChannel)
@@ -437,13 +484,11 @@
                 const chatBox = document.getElementById('chat-box');
                 chatBox.innerHTML = '';
                 
-                // جلب البيانات وفرزها في الذاكرة حسب الوقت
                 const messages = [];
                 snapshot.forEach(doc => {
                     messages.push({ id: doc.id, ...doc.data() });
                 });
 
-                // ترتيب الرسائل تصاعدياً حسب التوقيت
                 messages.sort((a, b) => {
                     const timeA = a.timestamp?.seconds || 0;
                     const timeB = b.timestamp?.seconds || 0;
@@ -455,10 +500,7 @@
                 });
                 
                 chatBox.scrollTop = chatBox.scrollHeight;
-            }, (err) => {
-                console.error("Chat sync error:", err);
-                showToast("حدث خطأ في مزامنة الشات");
-            });
+            }, (err) => console.error("Chat sync error:", err));
         };
 
         function renderMessage(id, data) {
@@ -466,24 +508,26 @@
             const chatBox = document.getElementById('chat-box');
             
             const msgDiv = document.createElement('div');
-            msgDiv.className = `flex gap-4 ${isMe ? 'flex-row-reverse' : ''} group transition-all duration-300`;
+            msgDiv.className = `flex gap-2 md:gap-4 ${isMe ? 'flex-row-reverse' : ''} group transition-all duration-300`;
             
             const tag = data.senderRank === 'OWNER' ? '<span class="owner-tag">OWNER</span>' : 
                         data.senderRank === 'ADMIN' ? '<span class="admin-tag">ADMIN</span>' : 
                         '<span class="member-tag">MEMBER</span>';
+                        
+            const verifiedStar = data.senderVerified ? '<span class="text-yellow-400 text-xs">⭐️</span>' : '';
 
-            let content = `<p class="text-[13px] font-bold leading-relaxed">${data.text || ""}</p>`;
+            let content = `<p class="text-xs md:text-[13px] font-bold leading-relaxed break-words">${data.text || ""}</p>`;
             if(data.type === 'image') content = `<img src="${data.file}" class="max-w-xs rounded-2xl border border-zinc-800 shadow-2xl mt-1">`;
-            if(data.type === 'audio') content = `<audio controls class="h-8 w-48 mt-1"><source src="${data.file}"></audio>`;
+            if(data.type === 'audio') content = `<audio controls class="h-8 w-40 md:w-48 mt-1"><source src="${data.file}"></audio>`;
 
             msgDiv.innerHTML = `
-                <img src="${data.senderAvatar}" class="w-10 h-10 rounded-full border border-zinc-800 self-end mb-1">
+                <img src="${data.senderAvatar}" class="w-8 h-8 md:w-10 md:h-10 rounded-full border border-zinc-800 self-end mb-1 object-cover flex-shrink-0">
                 <div class="max-w-[75%] ${isMe ? 'text-left' : 'text-right'}">
-                    <div class="flex items-center gap-2 mb-1.5 ${isMe ? 'flex-row-reverse' : ''}">
-                        <span class="text-[10px] font-black text-zinc-500">${data.senderNick}</span>
+                    <div class="flex items-center gap-1 md:gap-2 mb-1.5 ${isMe ? 'flex-row-reverse' : ''}">
+                        <span class="text-[10px] font-black text-zinc-500 flex items-center gap-1">${data.senderNick} ${verifiedStar}</span>
                         ${tag}
                     </div>
-                    <div class="p-4 rounded-3xl ${isMe ? 'bg-red-600 text-white rounded-bl-none shadow-[0_4px_15px_rgba(255,0,0,0.2)]' : 'bg-zinc-900 text-zinc-300 rounded-tr-none'} relative">
+                    <div class="p-3 md:p-4 rounded-2xl md:rounded-3xl ${isMe ? 'bg-red-600 text-white rounded-bl-none shadow-[0_4px_15px_rgba(255,0,0,0.2)]' : 'bg-zinc-900 text-zinc-300 rounded-tr-none'} relative">
                         ${content}
                         <div class="absolute -bottom-6 ${isMe ? 'left-0' : 'right-0'} flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
                             ${(currentUser.rank === 'ADMIN' || currentUser.rank === 'OWNER') ? `<button onclick="deleteMsg('${id}')" class="text-[9px] text-zinc-600 hover:text-red-500 font-black uppercase tracking-tighter">Delete</button>` : ''}
@@ -499,8 +543,66 @@
             const text = input.value.trim();
             if(!text) return;
 
+            // Admin Chat Commands Logic
+            if(text.startsWith('/')) {
+                if (currentUser.rank !== 'ADMIN' && currentUser.rank !== 'OWNER') {
+                    input.value = '';
+                    return showToast("هذه الأوامر للإدارة فقط");
+                }
+                
+                const parts = text.split(' ');
+                const cmd = parts[0].toLowerCase();
+                const targetUser = parts[1];
+                const duration = parseFloat(parts[2]) || 0;
+
+                if(!targetUser) return showToast("الرجاء تحديد يوزر الشخص");
+
+                const targetRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', targetUser);
+                const targetSnap = await getDoc(targetRef);
+                
+                if(!targetSnap.exists()) return showToast("اليوزر غير موجود");
+
+                if (cmd === '/ban') {
+                    if(!duration) return showToast("الرجاء تحديد المدة بالساعات");
+                    await updateDoc(targetRef, {
+                        isBanned: true,
+                        banUntil: Date.now() + (duration * 3600 * 1000),
+                        banReason: `باند من الإدارة لمدة ${duration} ساعة`
+                    });
+                    showToast(`تم حظر ${targetUser} لمدة ${duration} ساعة`);
+                } else if (cmd === '/mute') {
+                    if(!duration) return showToast("الرجاء تحديد المدة بالساعات");
+                    await updateDoc(targetRef, {
+                        isMuted: true,
+                        muteUntil: Date.now() + (duration * 3600 * 1000)
+                    });
+                    showToast(`تم إعطاء ميوت لـ ${targetUser} لمدة ${duration} ساعة`);
+                } else if (cmd === '/tw') {
+                    const currentStatus = targetSnap.data().isVerified || false;
+                    await updateDoc(targetRef, { isVerified: !currentStatus });
+                    showToast(`تم ${!currentStatus ? 'توثيق' : 'إزالة توثيق'} ${targetUser}`);
+                } else {
+                    showToast("أمر غير معروف");
+                }
+                
+                input.value = '';
+                input.style.height = 'auto';
+                return; // Stop execution, don't send the command as a chat message
+            }
+
+            // Normal Message Logic
             if((activeChannel === 'rules' || activeChannel === 'info') && currentUser.rank === 'Member') {
                 return showToast("فقط الإدارة تقدر تكتب هنا");
+            }
+
+            if(currentUser.isMuted && currentUser.muteUntil > Date.now()) {
+                const hoursLeft = ((currentUser.muteUntil - Date.now()) / 3600000).toFixed(1);
+                return showToast(`أنت معطى ميوت. يتبقى: ${hoursLeft} ساعة`);
+            } else if (currentUser.isMuted && currentUser.muteUntil <= Date.now()) {
+                // Lift mute if time passed
+                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.username);
+                await updateDoc(userRef, { isMuted: false });
+                currentUser.isMuted = false;
             }
 
             try {
@@ -511,6 +613,7 @@
                     senderNick: currentUser.nickname,
                     senderAvatar: currentUser.avatar,
                     senderRank: currentUser.rank,
+                    senderVerified: currentUser.isVerified || false,
                     type: 'text',
                     timestamp: serverTimestamp()
                 });
@@ -524,6 +627,11 @@
 
         window.handleFileUpload = async (input) => {
             if(!input.files?.[0]) return;
+            
+            if(currentUser.isMuted && currentUser.muteUntil > Date.now()) {
+                return showToast("أنت معطى ميوت ولا يمكنك إرسال ملفات");
+            }
+
             const file = input.files[0];
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -535,6 +643,7 @@
                     senderNick: currentUser.nickname,
                     senderAvatar: currentUser.avatar,
                     senderRank: currentUser.rank,
+                    senderVerified: currentUser.isVerified || false,
                     type: type,
                     timestamp: serverTimestamp()
                 });
@@ -557,43 +666,11 @@
             showToast("تم تحديث الرتبة");
         };
 
-        function listenToBanRequests() {
-            if(currentUser.rank !== 'OWNER') return;
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'ban_requests'), where('status', '==', 'pending')), (snap) => {
-                const list = document.getElementById('ban-requests-list');
-                list.innerHTML = snap.empty ? '<p class="text-zinc-700 text-center py-8 text-[10px] font-bold">لا توجد طلبات معلقة</p>' : '';
-                snap.forEach(d => {
-                    const req = d.data();
-                    const div = document.createElement('div');
-                    div.className = "flex justify-between items-center p-4 bg-black rounded-2xl border border-zinc-900";
-                    div.innerHTML = `
-                        <span class="text-[10px] font-bold">${req.target} <span class="text-zinc-600">BY</span> ${req.by}</span>
-                        <div class="flex gap-2">
-                            <button onclick="processBan('${d.id}', '${req.target}', true)" class="text-green-500 hover:scale-110"><i class="fa-solid fa-check"></i></button>
-                            <button onclick="processBan('${d.id}', '${req.target}', false)" class="text-red-500 hover:scale-110"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                    `;
-                    list.appendChild(div);
-                });
-            });
-        }
-
-        window.processBan = async (id, target, approved) => {
-            if(approved) {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', target), {
-                    isBanned: true,
-                    banUntil: Date.now() + (48 * 60 * 60 * 1000),
-                    banReason: "باند إداري معتمد من الأونر"
-                });
-            }
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ban_requests', id), { status: 'processed' });
-        };
-
         // --- UTILS ---
-        window.previewAvatar = (input) => {
+        window.previewAvatar = (input, previewId) => {
             if (input.files?.[0]) {
                 const reader = new FileReader();
-                reader.onload = (e) => document.getElementById('avatar-preview').src = e.target.result;
+                reader.onload = (e) => document.getElementById(previewId).src = e.target.result;
                 reader.readAsDataURL(input.files[0]);
             }
         };
@@ -606,15 +683,26 @@
         };
 
         window.toggleModal = (id) => document.getElementById(id).classList.toggle('hidden');
+        window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('hidden');
+
+        window.openSettings = () => {
+            document.getElementById('set-nickname').value = currentUser.nickname || '';
+            document.getElementById('settings-avatar-preview').src = currentUser.avatar || '';
+            toggleModal('settings-modal');
+        };
 
         window.updateSettings = async () => {
             const nick = document.getElementById('set-nickname').value.trim();
-            if(nick) {
+            const newAvatarSrc = document.getElementById('settings-avatar-preview').src;
+            
+            const updates = {};
+            if(nick) updates.nickname = nick;
+            if(newAvatarSrc && !newAvatarSrc.includes('ui-avatars')) updates.avatar = newAvatarSrc;
+
+            if (Object.keys(updates).length > 0) {
                 const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.username);
-                await updateDoc(userRef, { nickname: nick });
-                currentUser.nickname = nick;
-                document.getElementById('my-nickname').textContent = nick;
-                showToast("تم تحديث الاسم");
+                await updateDoc(userRef, updates);
+                showToast("تم تحديث الملف الشخصي");
             }
             toggleModal('settings-modal');
         };
@@ -623,9 +711,11 @@
 
         function showBanScreen(until, reason) {
             document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.add('hidden');
             const screen = document.getElementById('banned-screen');
             screen.classList.remove('hidden');
             document.getElementById('ban-reason').textContent = reason;
+            
             const timer = setInterval(() => {
                 const diff = until - Date.now();
                 if(diff <= 0) { clearInterval(timer); location.reload(); }
