@@ -3,448 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MysteryLife RP | Encrypted Waves</title>
+    <title>MysteryLife | Real-Time RTC Radio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;600;800&display=swap');
-
-        :root {
-            --primary-red: #ff0000;
-            --dark-red: #8b0000;
-            --bg-black: #050505;
-            --card-gray: #0f0f0f;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Syncopate:wght@400;700&display=swap');
+        
         body {
-            background-color: var(--bg-black);
-            color: #ffffff;
+            background: #050505;
+            color: #fff;
             font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
-            background-image: 
-                linear-gradient(rgba(255, 0, 0, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-        }
-
-        .mystery-border {
-            border: 1px solid rgba(255, 0, 0, 0.2);
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
-        }
-
-        .neon-red-text {
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-        }
-
-        .ptt-active {
-            background: radial-gradient(circle, var(--primary-red) 0%, var(--dark-red) 100%) !important;
-            box-shadow: 0 0 40px rgba(255, 0, 0, 0.6) !important;
-            transform: scale(0.95);
-        }
-
-        .user-card {
-            background: rgba(20, 20, 20, 0.6);
-            border-right: 4px solid transparent;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .user-card.speaking {
-            border-right-color: var(--primary-red);
-            background: rgba(255, 0, 0, 0.05);
-            transform: translateX(-5px);
-        }
-
-        .glass-header {
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 0, 0, 0.2);
-        }
-
-        .scanline {
-            width: 100%;
-            height: 2px;
-            background: rgba(255, 0, 0, 0.1);
-            position: absolute;
-            top: 0;
-            z-index: 50;
-            animation: scan 4s linear infinite;
-        }
-
-        @keyframes scan {
-            0% { top: 0; }
-            100% { top: 100%; }
+            background-image: radial-gradient(circle at center, #1a0808 0%, #050505 100%);
         }
 
         .orbitron { font-family: 'Syncopate', sans-serif; }
+
+        .radio-frame {
+            background: #0d0d0d;
+            border: 2px solid #222;
+            border-radius: 40px;
+            width: 380px;
+            padding: 30px;
+            box-shadow: 0 0 60px rgba(255, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .screen {
+            background: #000;
+            border: 1px solid #1a1a1a;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+            min-height: 100px;
+        }
+
+        .ptt-outer {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #111;
+            border: 8px solid #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .ptt-outer.active {
+            border-color: #ff0000;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.4);
+            transform: scale(0.95);
+        }
+
+        .ptt-inner {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #151515, #0a0a0a);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .ptt-outer.active .ptt-inner {
+            background: #ff0000;
+            color: #fff;
+        }
+
+        .led {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #222;
+        }
+
+        .led.active-tx { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        .led.active-rx { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
     </style>
 </head>
-<body class="h-screen flex items-center justify-center p-4">
-    <div class="scanline"></div>
+<body onclick="enableAudio()">
 
-    <!-- STARTUP / LOGIN SCREEN -->
-    <div id="setup-screen" class="w-full max-w-lg bg-[#0a0a0a] mystery-border rounded-lg p-10 z-20 transition-all duration-700">
-        <div class="text-center mb-10">
-            <h1 class="orbitron text-3xl font-bold tracking-tighter mb-2">
-                <span class="text-white">MYSTERY</span><span class="text-[#ff0000]">LIFE</span>
-            </h1>
-            <div class="h-1 w-20 bg-[#ff0000] mx-auto mb-4"></div>
-            <p class="text-xs text-gray-500 uppercase tracking-[0.3em]">Encrypted Tactical Radio</p>
+    <!-- Login Section -->
+    <div id="login" class="radio-frame text-center">
+        <h1 class="orbitron text-xl font-bold text-red-600 mb-6">MYSTERY RTC</h1>
+        <div class="space-y-4">
+            <input type="text" id="username" placeholder="CALLSIGN (E.G. ALPHA-1)" class="w-full bg-black border border-zinc-800 p-3 rounded-lg text-center font-bold uppercase outline-none focus:border-red-600 transition-all">
+            <input type="number" id="freq" placeholder="FREQUENCY (MHz)" value="101.5" class="w-full bg-black border border-zinc-800 p-3 rounded-lg text-center orbitron text-red-600 font-bold outline-none focus:border-red-600 transition-all">
+            <button id="connect" class="w-full bg-red-600 hover:bg-red-700 py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all active:scale-95">Establish Connection</button>
         </div>
-
-        <div class="space-y-6">
-            <!-- Warning Box for Firebase Configuration -->
-            <div id="auth-warning" class="hidden p-3 bg-amber-600/20 border border-amber-600 text-amber-500 text-[10px] uppercase font-bold text-center rounded">
-                Note: Offline Mode Active. Enable "Anonymous Auth" in Firebase for Multiplayer.
-            </div>
-            
-            <div class="relative">
-                <label class="text-[10px] uppercase font-bold text-gray-500 mb-2 block">Operator Identity</label>
-                <input type="text" id="username" placeholder="CALLSIGN / NAME" 
-                    class="w-full bg-black border border-zinc-800 p-4 rounded text-sm focus:outline-none focus:border-red-600 transition-all uppercase">
-            </div>
-            <div class="relative">
-                <label class="text-[10px] uppercase font-bold text-gray-500 mb-2 block">Frequency (MHz)</label>
-                <input type="number" id="frequency" step="0.1" placeholder="000.0" 
-                    class="w-full bg-black border border-zinc-800 p-4 rounded text-2xl orbitron font-bold text-red-600 focus:outline-none focus:border-red-600 transition-all">
-            </div>
-            <button id="initialize-link" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-5 rounded uppercase tracking-widest text-sm transition-all active:scale-95">
-                Initialize Secure Link
-            </button>
-        </div>
-        
-        <p class="mt-10 text-center text-[10px] text-zinc-600 uppercase tracking-widest">
-            Protected by MysteryLife RP Security Protocol
-        </p>
+        <p class="text-[9px] text-zinc-600 mt-6 uppercase tracking-widest">Secure Peer-to-Peer Protocol</p>
     </div>
 
-    <!-- MAIN RADIO INTERFACE -->
-    <div id="main-interface" class="hidden w-full max-w-6xl h-[700px] flex gap-4 transition-all duration-700 opacity-0 scale-95">
-        
-        <!-- MAIN PANEL (Center/Right) -->
-        <div class="flex-1 flex flex-col bg-[#080808] mystery-border rounded-lg overflow-hidden relative">
-            <div class="glass-header p-6 flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <div class="bg-red-600/10 p-3 rounded border border-red-600/30">
-                        <i class="fa-solid fa-tower-broadcast text-red-600 animate-pulse"></i>
-                    </div>
-                    <div>
-                        <h2 class="orbitron text-xs font-bold text-white uppercase" id="room-id-display">WAVE: 000.0</h2>
-                        <p class="text-[9px] text-red-500 font-bold uppercase tracking-widest">Status: <span id="sync-status">Syncing...</span></p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold">Active Operators</p>
-                    <p class="text-xl orbitron font-bold" id="user-count">0</p>
-                </div>
+    <!-- Radio Interface Section -->
+    <div id="radio" class="radio-frame hidden">
+        <div class="flex justify-between items-center mb-4 px-2">
+            <div class="flex flex-col items-center gap-1">
+                <div class="led" id="tx-led"></div>
+                <span class="text-[8px] text-zinc-600 font-bold">TX</span>
             </div>
-
-            <!-- Users List -->
-            <div id="users-list" class="flex-1 overflow-y-auto p-6 space-y-3">
-                <!-- User Items -->
-            </div>
-
-            <!-- Footer / PTT -->
-            <div class="p-10 bg-black/40 border-t border-zinc-900 flex flex-col items-center">
-                <div class="w-full h-16 mb-6">
-                    <canvas id="voice-waves" class="w-full h-full"></canvas>
-                </div>
-                
-                <button id="ptt-button" class="w-28 h-28 rounded-full bg-zinc-900 border-4 border-zinc-800 flex flex-col items-center justify-center text-zinc-500 transition-all duration-100 select-none cursor-pointer group">
-                    <i class="fa-solid fa-microphone text-3xl mb-1 group-hover:text-red-500"></i>
-                    <span class="text-[10px] font-black orbitron">PUSH</span>
-                </button>
-                
-                <p class="mt-4 text-[9px] text-zinc-600 uppercase font-bold tracking-[0.4em]">Broadcast Secured by MysteryLife</p>
+            <span class="orbitron text-[10px] text-zinc-500 tracking-tighter">ENCRYPTED VOICE LINK</span>
+            <div class="flex flex-col items-center gap-1">
+                <div class="led" id="rx-led"></div>
+                <span class="text-[8px] text-zinc-600 font-bold">RX</span>
             </div>
         </div>
 
-        <!-- SIDEBAR (Right) -->
-        <div class="w-80 flex flex-col gap-4">
-            <!-- Profile Card -->
-            <div class="bg-[#0a0a0a] mystery-border p-6 rounded-lg flex flex-col items-center text-center">
-                <div class="w-20 h-20 bg-zinc-900 rounded-full border-2 border-red-600 flex items-center justify-center mb-4">
-                    <i class="fa-solid fa-shield-halved text-2xl text-red-600"></i>
-                </div>
-                <h3 id="my-callsign" class="orbitron text-sm font-bold text-white mb-1">UNIT-01</h3>
-                <p class="text-[10px] text-zinc-500 uppercase tracking-widest mb-4">Authorized Personnel</p>
-                <div class="w-full h-px bg-zinc-800 mb-4"></div>
-                <button id="exit-link" class="w-full border border-red-600/30 hover:bg-red-600 hover:text-white text-red-600 py-3 rounded text-[10px] font-black uppercase tracking-widest transition-all">
-                    Disconnect
-                </button>
-            </div>
+        <div class="screen text-center flex flex-col justify-center">
+            <p id="display-freq" class="orbitron text-2xl text-red-600 font-bold mb-1 tracking-wider">000.00</p>
+            <p id="display-user" class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">UNIT: ---</p>
+            <div id="connection-status" class="text-[9px] text-zinc-400 mt-2 font-mono uppercase tracking-tighter">Initializing...</div>
+        </div>
 
-            <!-- Radio Info -->
-            <div class="flex-1 bg-[#0a0a0a] mystery-border p-6 rounded-lg overflow-hidden">
-                <h4 class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">System Logs</h4>
-                <div id="radio-logs" class="space-y-3 text-[10px] font-mono text-zinc-600 uppercase">
-                    <p class="text-green-600">> OS INITIALIZED</p>
-                    <p id="auth-log-status" class="text-zinc-500">> WAITING FOR AUTH...</p>
+        <div class="flex justify-center mb-8">
+            <div id="ptt" class="ptt-outer">
+                <div class="ptt-inner">
+                    <i class="fa-solid fa-microphone text-2xl mb-1"></i>
+                    <span class="text-[8px] font-black orbitron">PUSH TO TALK</span>
                 </div>
             </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <i class="fa-solid fa-volume-high text-zinc-700 text-sm"></i>
+            <input type="range" id="volume" class="w-full accent-red-600" min="0" max="1" step="0.1" value="1">
+            <span class="text-[9px] text-zinc-600 font-bold" id="vol-label">100%</span>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDJdlo9mSdINt3A4KLvpBdxXjK28LdrWB0",
+        // Global Firebase Configuration Handling
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : JSON.stringify({
+            apiKey: "",
             authDomain: "policerp-a71c8.firebaseapp.com",
             projectId: "policerp-a71c8",
             storageBucket: "policerp-a71c8.firebasestorage.app",
             messagingSenderId: "569720054342",
-            appId: "1:569720054342:web:858b7f239f5c35929ca047",
-            measurementId: "G-TVEYLTLBBC"
+            appId: "1:569720054342:web:858b7f239f5c35929ca047"
+        }));
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : "mystery-rtc-v10-en";
+
+        let localStream, pc, user, myName, myFreq;
+        const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+
+        // Helper to enable audio context on user interaction
+        window.enableAudio = () => { if (window.audioCtx) window.audioCtx.resume(); };
+
+        // Rule 3: Auth Before Queries
+        const initAuth = async () => {
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+          } else {
+            await signInAnonymously(auth);
+          }
         };
+        initAuth();
 
-        // Initialize Firebase
-        let app, db, auth;
-        let isFirebaseActive = false;
+        onAuthStateChanged(auth, (u) => {
+            user = u;
+        });
 
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-        } catch (e) {
-            console.error("Firebase initialization error", e);
-        }
-
-        const setupScreen = document.getElementById('setup-screen');
-        const mainInterface = document.getElementById('main-interface');
-        const pttButton = document.getElementById('ptt-button');
-        const usersList = document.getElementById('users-list');
-        const logsContainer = document.getElementById('radio-logs');
-        const authWarning = document.getElementById('auth-warning');
-        const syncStatus = document.getElementById('sync-status');
-
-        let currentUser = { uid: "local-" + Math.random().toString(36).substr(2, 9) };
-        let localStream = null;
-        let isSpeaking = false;
-        let myName = "";
-        let myFreq = "";
-
-        // Attempt Auth with error handling
-        const attemptAuth = async () => {
-            if (!auth) return;
-            try {
-                await signInAnonymously(auth);
-                const statusLog = document.getElementById('auth-log-status');
-                if (statusLog) {
-                    statusLog.className = "text-green-600";
-                    statusLog.textContent = "> AUTHENTICATED";
-                }
-                isFirebaseActive = true;
-                syncStatus.textContent = "Encrypted & Cloud Synced";
-            } catch (err) {
-                console.error("Auth restricted, running in local mode", err);
-                authWarning.classList.remove('hidden');
-                const statusLog = document.getElementById('auth-log-status');
-                if (statusLog) {
-                    statusLog.className = "text-amber-500";
-                    statusLog.textContent = "> AUTH RESTRICTED (LOCAL MODE)";
-                }
-                syncStatus.textContent = "Encrypted (Local Mode)";
-            }
-        };
-
-        attemptAuth();
-
-        if (auth) {
-            onAuthStateChanged(auth, user => { 
-                if(user) {
-                    currentUser = user;
-                    isFirebaseActive = true;
-                    authWarning.classList.add('hidden');
-                }
-            });
-        }
-
-        document.getElementById('initialize-link').onclick = async () => {
-            myName = document.getElementById('username').value.trim();
-            myFreq = document.getElementById('frequency').value.trim();
-
-            if(!myName || !myFreq) {
-                alert("Please enter operator identity and frequency.");
+        document.getElementById('connect').onclick = async () => {
+            if (!user) {
+                console.log("Waiting for auth...");
                 return;
             }
-
+            myName = document.getElementById('username').value.trim() || "Unit";
+            myFreq = document.getElementById('freq').value.trim();
+            
             try {
-                // Fix for OverconstrainedError: Use basic audio constraints
                 localStream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: true 
+                    audio: { echoCancellation: true, noiseSuppression: true } 
                 });
-                
                 localStream.getAudioTracks()[0].enabled = false;
 
-                document.getElementById('room-id-display').textContent = `WAVE: ${parseFloat(myFreq).toFixed(1)}`;
-                document.getElementById('my-callsign').textContent = myName;
-                
-                setupScreen.classList.add('hidden');
-                mainInterface.classList.remove('hidden');
-                setTimeout(() => {
-                    mainInterface.classList.add('opacity-100', 'scale-100');
-                }, 50);
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('radio').classList.remove('hidden');
+                document.getElementById('display-user').textContent = `CALLSIGN: ${myName}`;
+                document.getElementById('display-freq').textContent = `${myFreq} MHz`;
+                document.getElementById('connection-status').textContent = "Connecting to P2P Node...";
 
-                addLog(`LINK ESTABLISHED ON ${myFreq} MHZ`);
-                
-                if (isFirebaseActive) {
-                    await syncPresence(false);
-                    startListening();
-                } else {
-                    renderUser({ uid: currentUser.uid, name: myName, speaking: false });
-                    document.getElementById('user-count').textContent = "1 (Local)";
-                }
-                
-                initVisualizer();
-            } catch (e) {
-                console.error("Media access error:", e);
-                if (e.name === 'OverconstrainedError') {
-                    alert("Microphone Error: System could not satisfy audio constraints. Try refreshing or using a different mic.");
-                } else {
-                    alert("Microphone Access Denied. Required for radio transmission.");
-                }
+                initRTC();
+            } catch (err) {
+                alert("Microphone access is required for the tactical radio.");
             }
         };
 
-        async function syncPresence(speaking) {
-            if(!isFirebaseActive || !currentUser) return;
-            try {
-                const appId = "mysterylife-v4-red";
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'waves', currentUser.uid), {
-                    uid: currentUser.uid,
-                    name: myName,
-                    freq: myFreq,
-                    speaking: speaking,
-                    timestamp: Date.now()
-                });
-            } catch (err) {
-                console.error("Firestore sync error:", err);
-            }
-        }
-
-        function startListening() {
-            if(!isFirebaseActive) return;
-            const appId = "mysterylife-v4-red";
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'waves'), where("freq", "==", myFreq));
+        async function initRTC() {
+            if (!user) return;
+            pc = new RTCPeerConnection(config);
             
-            onSnapshot(q, (snapshot) => {
-                usersList.innerHTML = '';
-                let count = 0;
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    renderUser(data);
-                    count++;
-                });
-                document.getElementById('user-count').textContent = count;
-            }, (error) => {
-                console.error("Snapshot error:", error);
-                addLog("DATABASE SYNC ERROR");
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+            pc.ontrack = (event) => {
+                const remoteAudio = new Audio();
+                remoteAudio.srcObject = event.streams[0];
+                remoteAudio.volume = document.getElementById('volume').value;
+                remoteAudio.play();
+                
+                const rxLed = document.getElementById('rx-led');
+                rxLed.classList.add('active-rx');
+                document.getElementById('connection-status').textContent = "Receiving Signal...";
+                setTimeout(() => rxLed.classList.remove('active-rx'), 5000); 
+            };
+
+            pc.onicecandidate = (event) => {
+                if (event.candidate && user) {
+                    // Correcting Path to follow Rule 1: /artifacts/{appId}/public/data/{collectionName}
+                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ice', user.uid), {
+                        candidate: event.candidate.toJSON(),
+                        freq: myFreq,
+                        ts: Date.now()
+                    });
+                }
+            };
+
+            // Rule 1: Using correct path structures for public data
+            const signalsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'signals');
+            const iceColRef = collection(db, 'artifacts', appId, 'public', 'data', 'ice');
+
+            onSnapshot(query(signalsColRef, where("freq", "==", myFreq)), async (snap) => {
+                snap.docChanges().forEach(async change => {
+                    const data = change.doc.data();
+                    if (change.type === "added" && data.senderId !== user.uid) {
+                        if (data.type === "offer") {
+                            await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+                            const answer = await pc.createAnswer();
+                            await pc.setLocalDescription(answer);
+                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'signals', user.uid), {
+                                type: "answer", sdp: answer, senderId: user.uid, freq: myFreq, ts: Date.now()
+                            });
+                        } else if (data.type === "answer") {
+                            await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+                            document.getElementById('connection-status').textContent = "Handshake Complete - Ready";
+                        }
+                    }
+                }, (error) => console.error("Signals Listener Error:", error));
+            });
+
+            onSnapshot(query(iceColRef, where("freq", "==", myFreq)), async (snap) => {
+                snap.docChanges().forEach(async change => {
+                    if (change.type === "added" && change.doc.id !== user.uid) {
+                        const data = change.doc.data();
+                        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+                    }
+                }, (error) => console.error("ICE Listener Error:", error));
+            });
+
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'signals', user.uid), {
+                type: "offer", sdp: offer, senderId: user.uid, freq: myFreq, ts: Date.now()
             });
         }
 
-        function renderUser(user) {
-            const isMe = user.uid === currentUser.uid;
-            if (document.getElementById(`user-${user.uid}`)) return;
+        const ptt = document.getElementById('ptt');
+        const txLed = document.getElementById('tx-led');
 
-            const card = document.createElement('div');
-            card.id = `user-${user.uid}`;
-            card.className = `user-card p-4 rounded flex justify-between items-center ${user.speaking ? 'speaking' : ''}`;
-            card.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="w-10 h-10 bg-black rounded flex items-center justify-center border border-zinc-800">
-                            <i class="fa-solid fa-user-shield ${user.speaking ? 'text-red-500' : 'text-zinc-700'}"></i>
-                        </div>
-                        ${user.speaking ? '<div class="absolute -top-1 -left-1 w-3 h-3 bg-red-600 rounded-full animate-ping"></div>' : ''}
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold orbitron uppercase">${user.name} ${isMe ? '<span class="text-[9px] text-zinc-500">(YOU)</span>' : ''}</p>
-                        <p class="text-[8px] tracking-[0.2em] font-bold ${user.speaking ? 'text-red-500' : 'text-zinc-600'}">
-                            ${user.speaking ? '>> RECEIVING BROADCAST' : '>> STANDBY'}
-                        </p>
-                    </div>
-                </div>
-            `;
-            usersList.appendChild(card);
-        }
-
-        const startTalk = async () => {
-            if(isSpeaking) return;
-            isSpeaking = true;
-            pttButton.classList.add('ptt-active');
-            if(localStream) localStream.getAudioTracks()[0].enabled = true;
-            await syncPresence(true);
-            addLog(`TRANSMITTING...`);
-            
-            if(!isFirebaseActive) {
-                const me = document.getElementById(`user-${currentUser.uid}`);
-                if(me) me.classList.add('speaking');
-            }
-        };
-
-        const stopTalk = async () => {
-            if(!isSpeaking) return;
-            isSpeaking = false;
-            pttButton.classList.remove('ptt-active');
-            if(localStream) localStream.getAudioTracks()[0].enabled = false;
-            await syncPresence(false);
-            addLog(`TRANSMISSION ENDED`);
-
-            if(!isFirebaseActive) {
-                const me = document.getElementById(`user-${currentUser.uid}`);
-                if(me) me.classList.remove('speaking');
-            }
-        };
-
-        pttButton.onmousedown = startTalk;
-        pttButton.onmouseup = stopTalk;
-        pttButton.ontouchstart = (e) => { e.preventDefault(); startTalk(); };
-        pttButton.ontouchend = (e) => { e.preventDefault(); stopTalk(); };
-
-        document.getElementById('exit-link').onclick = async () => {
-            if(isFirebaseActive && currentUser) {
-                const appId = "mysterylife-v4-red";
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'waves', currentUser.uid));
-                } catch(e) {}
-            }
-            location.reload();
-        };
-
-        function addLog(msg) {
-            const p = document.createElement('p');
-            p.textContent = `> ${msg}`;
-            logsContainer.prepend(p);
-        }
-
-        function initVisualizer() {
-            const canvas = document.getElementById('voice-waves');
-            const ctx = canvas.getContext('2d');
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioCtx.createMediaStreamSource(localStream);
-            const analyser = audioCtx.createAnalyser();
-            source.connect(analyser);
-            analyser.fftSize = 128;
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-
-            function draw() {
-                requestAnimationFrame(draw);
-                analyser.getByteFrequencyData(dataArray);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const barWidth = (canvas.width / bufferLength) * 2;
-                let x = 0;
-                for(let i = 0; i < bufferLength; i++) {
-                    const barHeight = dataArray[i] / 4;
-                    ctx.fillStyle = isSpeaking ? '#ff0000' : '#1a1a1a';
-                    ctx.fillRect(x, canvas.height/2 - barHeight/2, barWidth, barHeight);
-                    x += barWidth + 2;
+        const toggleMic = (state) => {
+            if (localStream) {
+                localStream.getAudioTracks()[0].enabled = state;
+                if (state) {
+                    ptt.classList.add('active');
+                    txLed.classList.add('active-tx');
+                    document.getElementById('connection-status').textContent = "Broadcasting...";
+                } else {
+                    ptt.classList.remove('active');
+                    txLed.classList.remove('active-tx');
+                    document.getElementById('connection-status').textContent = "Standby - Waiting";
                 }
             }
-            draw();
-        }
+        };
+
+        ptt.onmousedown = ptt.ontouchstart = (e) => { e.preventDefault(); toggleMic(true); };
+        ptt.onmouseup = ptt.onmouseleave = ptt.ontouchend = () => toggleMic(false);
+
+        document.getElementById('volume').oninput = (e) => {
+            document.getElementById('vol-label').textContent = `${Math.round(e.target.value * 100)}%`;
+        };
+
+        window.onbeforeunload = () => {
+            if (user) {
+                deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'signals', user.uid));
+                deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ice', user.uid));
+            }
+        };
     </script>
 </body>
 </html>
